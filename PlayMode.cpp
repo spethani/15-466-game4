@@ -13,16 +13,26 @@
 #include <random>
 
 // For text
-#include <ft2build.h>
-#include FT_FREETYPE_H  
-
-#include <hb.h>
-#include <hb-ft.h>
-
 #define FONT_SIZE 36
 #define MARGIN (FONT_SIZE * .5)
 
+#include "TextRenderingProgram.hpp"
+
 PlayMode::PlayMode() {
+	{// Creating a VBO and VAO for rendering the quads, taken from https://learnopengl.com/in-Practice/text-rendering
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);   
+	}
 	{ // Perform text shaping, rendering
 		// Shaping code referenced from https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
 		std::string fontfile = data_path("OpenSans-Medium.ttf");
@@ -44,7 +54,6 @@ PlayMode::PlayMode() {
 		hb_font = hb_ft_font_create (ft_face, NULL);
 
 		// Create buffer and populate
-		hb_buffer_t *hb_buffer;
 		hb_buffer = hb_buffer_create();
 		hb_buffer_add_utf8(hb_buffer, text.c_str(), -1, 0, -1);
 		hb_buffer_guess_segment_properties(hb_buffer);
@@ -55,39 +64,52 @@ PlayMode::PlayMode() {
 		// Get glyph information and positions out of the buffer.
 		unsigned int len = hb_buffer_get_length(hb_buffer);
 		hb_glyph_info_t *info = hb_buffer_get_glyph_infos(hb_buffer, NULL);
-		hb_glyph_position_t *pos = hb_buffer_get_glyph_positions(hb_buffer, NULL);
+		//hb_glyph_position_t *pos = hb_buffer_get_glyph_positions(hb_buffer, NULL);
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-
-		// Get glyph ids and absolute positions
+		// Get glyph ids and create textures
 		std::vector<Character> characters;
-		double current_x = 0;
-		double current_y = 0;
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 		for (unsigned int i = 0; i < len; i++) {
-			hb_codepoint_t gid   = info[i].codepoint;
-			double x_position = current_x + pos[i].x_offset / 64.;
-			double y_position = current_y + pos[i].y_offset / 64.;
+			hb_codepoint_t gid = info[i].codepoint;
 
 			// Rendering taken from https://freetype.org/freetype2/docs/tutorial/step1.html
 			ft_error = FT_Load_Glyph(ft_face, gid, 0); // Load glyph with FreeType
 			if (ft_error) std::cerr << "Failed to load glyph" << std::endl;
 			ft_error = FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL); // Render glyph into bitmap
 			if (ft_error) std::cerr << "Failed to render glyph" << std::endl;
-			ft_face->glyph->bitmap_left = (FT_Int)x_position; // position x of glyph
-			ft_face->glyph->bitmap_top = (FT_Int)y_position; // position y of glyph
 
-			// Print some info about glyph
-			char glyphname[32];
-			hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof (glyphname));
-
-			printf("glyph='%s'	glyph id=%d	position=(%g,%g)\n",
-				glyphname, gid, x_position, y_position);
-
-			// Update current x and y positions
-			current_x += pos[i].x_advance / 64.;
-			current_y += pos[i].y_advance / 64.;
+			if (Characters.find(gid) == Characters.end()) { // Check if we have texture for codepoint
+				// Code taken from https://learnopengl.com/in-Practice/text-rendering
+				// generate texture
+				unsigned int texture;
+				glGenTextures(1, &texture);
+				glBindTexture(GL_TEXTURE_2D, texture);
+				glTexImage2D(
+					GL_TEXTURE_2D,
+					0,
+					GL_RED,
+					ft_face->glyph->bitmap.width,
+					ft_face->glyph->bitmap.rows,
+					0,
+					GL_RED,
+					GL_UNSIGNED_BYTE,
+					ft_face->glyph->bitmap.buffer
+				);
+				// set texture options
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				// now store character for later use
+				Character character = {
+					texture, 
+					glm::ivec2(ft_face->glyph->bitmap.width, ft_face->glyph->bitmap.rows),
+					glm::ivec2(ft_face->glyph->bitmap_left, ft_face->glyph->bitmap_top),
+					(unsigned int)ft_face->glyph->advance.x
+				};
+				Characters.insert(std::pair<hb_codepoint_t, Character>(gid, character));
+			}
 		}
-		
 		// Clean up resources
 		/*FT_Done_FreeType(ft_library);
 		FT_Done_Face(ft_face);
@@ -106,4 +128,50 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+	render_text(25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	GL_ERRORS();
+}
+
+void PlayMode::render_text(float x, float y, float scale, glm::vec3 color) {
+    // Activate corresponding render state	
+    glUseProgram(text_rendering_program->program);
+    glUniform3f(glGetUniformLocation(text_rendering_program->program, "textColor"), color.x, color.y, color.z);
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(VAO);
+
+    // Iterate through all characters
+	unsigned int len = hb_buffer_get_length(hb_buffer);
+	hb_glyph_info_t *info = hb_buffer_get_glyph_infos(hb_buffer, NULL);
+    for (unsigned int i = 0; i < len; i++) {
+		hb_codepoint_t gid = info[i].codepoint;
+        Character ch = Characters[gid];
+
+        float xpos = x + ch.Bearing.x * scale;
+        float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+        float w = ch.Size.x * scale;
+        float h = ch.Size.y * scale;
+        // update VBO for each character
+        float vertices[6][4] = {
+            { xpos,     ypos + h,   0.0f, 0.0f },            
+            { xpos,     ypos,       0.0f, 1.0f },
+            { xpos + w, ypos,       1.0f, 1.0f },
+
+            { xpos,     ypos + h,   0.0f, 0.0f },
+            { xpos + w, ypos,       1.0f, 1.0f },
+            { xpos + w, ypos + h,   1.0f, 0.0f }           
+        };
+        // render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+        // update content of VBO memory
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // render quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+    }
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
