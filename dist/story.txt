@@ -1,0 +1,37 @@
+0
+A door slams behind you.
+Looks like you're stuck here. Who would've thought that walking
+into an abandoned mansion for cover from the rain would end up this way?
+1 Enter room to right
+4 Enter room to left
+
+1
+Multiple couches sit before a fireplace. 
+The fireplace looks unused for some time, as the mantle is dusty.
+You hear a scuffling noise under one of the couches.
+2 Inspect the couch
+3 Exit room
+
+2
+You check under the couch. 
+You see a dark shadow pass from the corner of your eye.
+Nothing is under the couch, and the noises halt.
+3 Exit room
+
+3
+You're back in the hallway which you saw when you entered.
+4 Enter room to left
+
+4
+You see a young girl sobbing on her knees.
+5 Console her
+6 Proceed to next room
+
+5
+You console the girl. She looks up, and vanishes.
+Almost like she never existed in the first place.
+6 Proceed to the next room
+
+6
+You leave the mansion.
+0 Play again

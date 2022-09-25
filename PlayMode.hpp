@@ -25,6 +25,7 @@ struct PlayMode : Mode {
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
+	//----- text rendering and display -----
 	//for shaping text
 	hb_buffer_t *hb_buffer;
 	hb_font_t *hb_font;
@@ -48,6 +49,15 @@ struct PlayMode : Mode {
 
 	void render_text(std::string text, double x, double y, glm::vec3 color, float screen_width, float screen_height);
 
-	//----- game state -----
+	//----- story progression -----
+	struct StoryChoice {
+		unsigned int story_index;
+		std::string choice_text;
+	};
+	struct StoryScene {
+		std::string scene_text;
+		std::vector<StoryChoice> story_choices;
+	};
+	std::vector<StoryScene> story_scenes;
 
 };

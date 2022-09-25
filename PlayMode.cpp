@@ -18,6 +18,12 @@
 
 #include "TextRenderingProgram.hpp"
 
+// For file reading
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cctype>
+
 PlayMode::PlayMode() {
 	{// Creating a VBO and VAO for rendering the quads, taken from https://learnopengl.com/in-Practice/text-rendering
 		glEnable(GL_BLEND);
@@ -50,6 +56,86 @@ PlayMode::PlayMode() {
 
 		// Create buffer and populate
 		hb_buffer = hb_buffer_create();
+	}
+	{ // Parse story file
+		std::string current_line;
+		std::ifstream story_file(data_path("story.txt"));
+		unsigned int story_index = 0;
+
+		// Read scene
+		while (std::getline(story_file, current_line)) {
+			StoryScene story_scene;
+
+			// Check index for scene matches file
+			unsigned int line_index;
+			std::stringstream(current_line) >> line_index;
+			if (line_index != story_index) {
+				std::cout << "Warning: index for scene in file does not match actual index";
+			}
+
+			// Get lines for the scene description
+			std::string scene_text = "";
+			while (std::getline(story_file, current_line)) {
+				if (isdigit(current_line[0])) {
+					break;
+				}
+				else {
+					scene_text += current_line;
+					scene_text += "\n";
+				}
+			}
+			story_scene.scene_text = scene_text;
+
+			// Get lines for the choices
+			std::vector<StoryChoice> story_choices;
+			unsigned int transition_index;
+			std::string ss_buffer;
+
+			{ 
+				StoryChoice story_choice;
+				std::string choice_text = "";
+				std::stringstream ss(current_line);
+				ss >> transition_index;
+				while (ss >> ss_buffer) {
+					choice_text += ss_buffer + " ";
+				}
+				story_choice.story_index = transition_index;
+				story_choice.choice_text = choice_text;
+				story_choices.push_back(story_choice);
+			}
+
+			while (std::getline(story_file, current_line)) {
+				if (current_line.empty()) {
+					break;
+				}
+
+				StoryChoice story_choice;
+				std::string choice_text = "";
+				std::stringstream ss(current_line);
+				ss >> transition_index;
+				while (ss >> ss_buffer) {
+					choice_text += ss_buffer + " ";
+				}
+				story_choice.story_index = transition_index;
+				story_choice.choice_text = choice_text;
+				story_choices.push_back(story_choice);
+			}
+
+			story_scene.story_choices = story_choices;
+
+			// Add scene to story_scenes
+			story_scenes.push_back(story_scene);
+			story_index++;
+		}
+	}
+	{ // DEBUG: Print story scenes
+		for (StoryScene story_scene : story_scenes) {
+			std::cout << story_scene.scene_text << std::endl;
+			for (StoryChoice story_choice : story_scene.story_choices) {
+				std::cout << story_choice.story_index << " " << story_choice.choice_text << std::endl;
+			}
+			std::cout << std::endl;
+		}
 	}
 }
 
