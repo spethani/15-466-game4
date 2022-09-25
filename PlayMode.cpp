@@ -68,22 +68,22 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
-	// Orthographic projection matrix allows us to specify all vertex coordinates in screen coordinates
-	glm::mat4 projection = glm::ortho(0.0f, (float)drawable_size.x, 0.0f, (float)drawable_size.y);
-	glUniformMatrix4fv(glGetUniformLocation(text_rendering_program->program, "projection"), 1, GL_FALSE, &projection[0][0]); // set projection value in shader to be our matrix
-
 	// Display text
-	render_text("How are you\n doing today?", 25.0f, 25.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	render_text("How are you\n doing today?", 25.0f, 25.0f, glm::vec3(0.5, 0.8f, 0.2f), (float)drawable_size.x, (float)drawable_size.y);
 	GL_ERRORS();
 }
 
-void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color) {
+void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color, float screen_width, float screen_height) {
 	/* Below code based off of https://learnopengl.com/in-Practice/text-rendering */ 
     // Activate corresponding render state	
     glUseProgram(text_rendering_program->program);
     glUniform3f(glGetUniformLocation(text_rendering_program->program, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
+
+	// Orthographic projection matrix allows us to specify all vertex coordinates in screen coordinates
+	glm::mat4 projection = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
+	glUniformMatrix4fv(glGetUniformLocation(text_rendering_program->program, "projection"), 1, GL_FALSE, &projection[0][0]); // set projection value in shader to be our matrix
 
 	// Shape text
 	hb_buffer_clear_contents(hb_buffer);
@@ -106,7 +106,6 @@ void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color
 			double y_advance = pos[i].y_advance / 64.;
 			double x_offset  = pos[i].x_offset / 64.;
 			double y_offset  = pos[i].y_offset / 64.;
-			std::cout << x_advance << " " << y_advance << " " << x_offset << " " << y_offset << std::endl;
 
 			// Render the text, taken from https://freetype.org/freetype2/docs/tutorial/step1.html
 			ft_error = FT_Load_Glyph(ft_face, gid, 0); // Load glyph with FreeType

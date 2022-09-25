@@ -46,7 +46,7 @@ struct PlayMode : Mode {
 
 	unsigned int VAO, VBO;
 
-	void render_text(std::string text, double x, double y, glm::vec3 color);
+	void render_text(std::string text, double x, double y, glm::vec3 color, float screen_width, float screen_height);
 
 	//----- game state -----
 
