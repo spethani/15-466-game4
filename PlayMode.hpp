@@ -27,19 +27,26 @@ struct PlayMode : Mode {
 
 	//for shaping text
 	hb_buffer_t *hb_buffer;
+	hb_font_t *hb_font;
+
+	//for rendering text
+	FT_Library ft_library;
+	FT_Face ft_face;
+	FT_Error ft_error;
 
 	//for displaying text, taken from https://learnopengl.com/in-Practice/text-rendering
 	struct Character {
-		unsigned int TextureID;  // ID handle of the glyph texture
-		glm::ivec2   Size;       // Size of glyph
-		glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
-		unsigned int Advance;    // Offset to advance to next glyph
+		unsigned int texture_id;  // ID handle of the glyph texture
+		glm::ivec2 size; // Size of glyph
+		glm::ivec2 bearing; // Offset from baseline to left/top of glyph
+		glm::dvec2 offset; // Offset of the current glyph
+		glm::dvec2 advance; // advance to the next glyph
 	};
 	std::map<hb_codepoint_t, Character> Characters;
 
 	unsigned int VAO, VBO;
 
-	void render_text(float x, float y, float scale, glm::vec3 color);
+	void render_text(std::string text, double x, double y, glm::vec3 color);
 
 	//----- game state -----
 
