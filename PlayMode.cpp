@@ -69,11 +69,14 @@ void PlayMode::update(float elapsed) {
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	// Display text
-	render_text("How are you\n doing today?", 25.0f, 25.0f, glm::vec3(0.5, 0.8f, 0.2f), (float)drawable_size.x, (float)drawable_size.y);
+	render_text("How are you\ndoing today?", 100.0f, 100.0f, glm::vec3(0.5, 0.8f, 0.2f), (float)drawable_size.x, (float)drawable_size.y);
 	GL_ERRORS();
 }
 
 void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color, float screen_width, float screen_height) {
+	double current_x = x;
+	double current_y = y;
+
 	/* Below code based off of https://learnopengl.com/in-Practice/text-rendering */ 
     // Activate corresponding render state	
     glUseProgram(text_rendering_program->program);
@@ -147,9 +150,14 @@ void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color
 
 		assert(Characters.find(gid) != Characters.end());
         Character ch = Characters[gid];
+		
+		if (gid == 0) { // New line character
+			current_x = x;
+			current_y -= ft_face->size->metrics.height / 64.;
+		}
 
-        float xpos = (float)(x + ch.bearing.x + ch.offset.x);
-        float ypos = (float)(y - (ch.size.y - ch.bearing.y) + ch.offset.y);
+        float xpos = (float)(current_x + ch.bearing.x + ch.offset.x);
+        float ypos = (float)(current_y - (ch.size.y - ch.bearing.y) + ch.offset.y);
 
         float w = (float)ch.size.x;
         float h = (float)ch.size.y;
@@ -172,8 +180,10 @@ void PlayMode::render_text(std::string text, double x, double y, glm::vec3 color
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += ch.advance.x;
-		y += ch.advance.y;
+		if (gid != 0) { // check that it isn't a newline
+			current_x += ch.advance.x;
+			current_y += ch.advance.y;
+		}
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
