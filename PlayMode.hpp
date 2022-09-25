@@ -38,7 +38,6 @@ struct PlayMode : Mode {
 	std::map<hb_codepoint_t, Character> Characters;
 
 	unsigned int VAO, VBO;
-	glm::mat4 projection = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f); // corresponds to size of screen
 
 	void render_text(float x, float y, float scale, glm::vec3 color);
 

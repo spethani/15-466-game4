@@ -22,6 +22,7 @@ PlayMode::PlayMode() {
 	{// Creating a VBO and VAO for rendering the quads, taken from https://learnopengl.com/in-Practice/text-rendering
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+		glDisable(GL_DEPTH_TEST);
 
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
@@ -128,11 +129,16 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+	// Orthographic projection matrix allows us to specify all vertex coordinates in screen coordinates
+	glm::mat4 projection = glm::ortho(0.0f, (float)drawable_size.x, 0.0f, (float)drawable_size.y);
+	glUniformMatrix4fv(glGetUniformLocation(text_rendering_program->program, "projection"), 1, GL_FALSE, &projection[0][0]); // set projection value in shader to be our matrix
+
+	// Display text
 	render_text(25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
 	GL_ERRORS();
 }
 
-void PlayMode::render_text(float x, float y, float scale, glm::vec3 color) {
+void PlayMode::render_text(float x, float y, float scale, glm::vec3 color) { // Base code taken from https://learnopengl.com/in-Practice/text-rendering
     // Activate corresponding render state	
     glUseProgram(text_rendering_program->program);
     glUniform3f(glGetUniformLocation(text_rendering_program->program, "textColor"), color.x, color.y, color.z);
