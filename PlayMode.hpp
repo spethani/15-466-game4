@@ -59,5 +59,12 @@ struct PlayMode : Mode {
 		std::vector<StoryChoice> story_choices;
 	};
 	std::vector<StoryScene> story_scenes;
+	unsigned int current_story;
+	unsigned int current_choice;
 
+	//----- game state -----
+	//input tracking:
+	struct Button {
+		uint8_t pressed = 0;
+	} enter, down, up;
 };

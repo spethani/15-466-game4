@@ -25,7 +25,7 @@
 #include <cctype>
 
 PlayMode::PlayMode() {
-	{// Creating a VBO and VAO for rendering the quads, taken from https://learnopengl.com/in-Practice/text-rendering
+	{ // Creating a VBO and VAO for rendering the quads, taken from https://learnopengl.com/in-Practice/text-rendering
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 		glDisable(GL_DEPTH_TEST);
@@ -127,15 +127,9 @@ PlayMode::PlayMode() {
 			story_scenes.push_back(story_scene);
 			story_index++;
 		}
-	}
-	{ // DEBUG: Print story scenes
-		for (StoryScene story_scene : story_scenes) {
-			std::cout << story_scene.scene_text << std::endl;
-			for (StoryChoice story_choice : story_scene.story_choices) {
-				std::cout << story_choice.story_index << " " << story_choice.choice_text << std::endl;
-			}
-			std::cout << std::endl;
-		}
+
+		current_story = 0;
+		current_choice = 0;
 	}
 }
 
@@ -147,15 +141,84 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+	if (evt.type == SDL_KEYDOWN) {
+		if (evt.key.keysym.sym == SDLK_UP) {
+			up.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_DOWN) {
+			down.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_RETURN) {
+			enter.pressed = true;
+			return true;
+		}
+	} else if (evt.type == SDL_KEYUP) {
+		if (evt.key.keysym.sym == SDLK_UP) {
+			up.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_DOWN) {
+			down.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_RETURN) {
+			enter.pressed = false;
+			return true;
+		}
+	}
 	return false;
 }
 
 void PlayMode::update(float elapsed) {
+	std::vector<StoryChoice> story_choices = story_scenes[current_story].story_choices;
+	unsigned int num_choices = (unsigned int)story_choices.size();
+	if (up.pressed) {
+		if (current_choice == 0) {
+			current_choice = num_choices - 1;
+		}
+		else {
+			current_choice--;
+		}
+	}
+	else if (down.pressed) {
+		if (current_choice == num_choices - 1) {
+			current_choice = 0;
+		}
+		else {
+			current_choice++;
+		}
+	}
+	else if (enter.pressed) {
+		current_story = story_choices[current_choice].story_index;
+		current_choice = 0;
+	}
+
+	up.pressed = false;
+	down.pressed = false;
+	enter.pressed = false;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+	// Clear buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Create text
+	StoryScene current_scene = story_scenes[current_story];
+	std::string current_text = "";
+	current_text += current_scene.scene_text + "\n";
+	for (unsigned int i = 0; i < current_scene.story_choices.size(); i++) {
+		StoryChoice story_choice = current_scene.story_choices[i];
+		if (i == current_choice) {
+			current_text += "[ " + story_choice.choice_text + " ]\n";
+		}
+		else {
+			current_text += story_choice.choice_text + "\n";
+		}
+	}
+
 	// Display text
-	render_text("How are you\ndoing today?", 100.0f, 100.0f, glm::vec3(0.5, 0.8f, 0.2f), (float)drawable_size.x, (float)drawable_size.y);
+	float x_pos = 50.0f;
+	float y_pos = 600.0f;
+	glm::vec3 color(0.43, 0.52, 0.76);
+	render_text(current_text, x_pos, y_pos, color, (float)drawable_size.x, (float)drawable_size.y);
 	GL_ERRORS();
 }
 
