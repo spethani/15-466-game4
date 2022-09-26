@@ -13,7 +13,7 @@
 #include <random>
 
 // For text
-#define FONT_SIZE 36
+#define FONT_SIZE 48
 #define MARGIN (FONT_SIZE * .5)
 
 #include "TextRenderingProgram.hpp"
@@ -41,7 +41,7 @@ PlayMode::PlayMode() {
 		glBindVertexArray(0);   
 	}
 	{ // Initialize for harfbuzz and freetype
-		std::string fontfile = data_path("OpenSans-Medium.ttf");
+		std::string fontfile = data_path("ReenieBeanie-Regular.ttf");
 
 		// Initialize FreeType and create the font
 		ft_error = FT_Init_FreeType(&ft_library); // freetype library init
@@ -215,8 +215,9 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	// Display text
-	float x_pos = 50.0f;
-	float y_pos = 600.0f;
+	float margin = 100.0f;
+	float x_pos = margin;
+	float y_pos = (float)drawable_size.y - margin;
 	glm::vec3 color(0.43, 0.52, 0.76);
 	render_text(current_text, x_pos, y_pos, color, (float)drawable_size.x, (float)drawable_size.y);
 	GL_ERRORS();

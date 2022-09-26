@@ -1,7 +1,7 @@
 0
-A door slams behind you.
-Looks like you're stuck here. Who would've thought that walking
-into an abandoned mansion for cover from the rain would end up this way?
+A door slams behind you. Looks like you're stuck here. 
+Who would've thought that walking into an abandoned mansion 
+for cover from the rain would end up this way?
 1 Enter room to right
 4 Enter room to left
 
