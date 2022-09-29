@@ -2,7 +2,7 @@
 
 Author: Sarah Pethani
 
-Design: You explore a haunted house that a young girl lives in. Find a way to leave.
+Design: You are locked in a haunted house that a young girl lives in. Find a way to leave.
 
 Text Drawing: We use harfbuzz to shape the text, and freetype to render text. At runtime, we pass some text to a function called render_text, which adds the text to the harfbuzz buffer and shapes it. For each character, if we had seen it previously, we use the texture we have stored. Otherwise, we use freetype to render the glyph, create a texture using OpenGL, and store it in our dictionary of characters/textures. We then display the texture. All text drawing logic occurs at runtime.
 
