@@ -20,18 +20,196 @@ Nothing is under the couch, and the noises halt.
 
 3
 You're back in the hallway which you saw when you entered.
+1 Enter room to right
 4 Enter room to left
 
 4
-You see a young girl sobbing on her knees.
+You see a young girl sobbing on her knees. She doesn't
+seem to notice you entering the room. The door to
+the next room is behind her.
 5 Console her
 6 Proceed to next room
+3 Go back to the hallway
 
 5
 You console the girl. She looks up, and vanishes.
 Almost like she never existed in the first place.
-6 Proceed to the next room
+7 Proceed to the next room
+3 Go back to the hallway
 
 6
-You leave the mansion.
+You try to walk around the sobbing girl to get to the next room.
+She notices you as you get closer. She screeches.
+0 Play again
+
+7
+You enter a bedroom. A TV is on the wall. 
+The lights are turned off.
+8 Turn on the lights
+9 Turn on the TV
+
+8
+You turn the lights on. They flicker.
+You turn them off.
+9 Turn on the TV
+
+9
+You turn the TV on. Nothing seems to happen.
+8 Turn on the lights
+10 Turn off the TV
+
+10
+The TV falls to the ground. There is a crawlspace
+located where it fell off the wall. 
+You also notice a new door on the wall behind you.
+11 Enter crawlspace
+14 Open new door
+
+11
+The crawlspace is too cramped for your body.
+12 Squeeze through
+13 Give up on crawling through
+
+12
+You are completely stuck. You are trapped.
+0 Play again
+
+13
+You gave up on crawling through the crawlspace.
+14 Go through the new door
+
+14
+You enter a hallway. There are two doors on each
+side of the hallway. 
+15 Enter door 1
+16 Enter door 2
+24 Enter door 3
+26 Enter door 4
+
+15
+You enter a small child's bedroom. You see the same girl from before.
+There is a window behind her.
+14 Leave the room
+
+16
+You enter a big bedroom. There is candy on one of the dressers.
+There are also family photos along the wall.
+You see the girl you saw before in some of them.
+17 Take the photos
+18 Take the candy
+
+17
+You take the photos. You hear a noise at the doorway.
+You turn around and see a girl standing at the doorway.
+She screeches.
+0 Play again
+
+18
+You decide to take the candy. The family photos
+fall to the ground. 
+17 Pick up the photos
+19 Leave the room
+
+19
+You enter a hallway. There are two doors on each
+side of the hallway. 
+20 Enter door 1
+24 Enter door 3
+26 Enter door 4
+
+20
+You enter a small child's bedroom. You see the same girl from before.
+There is a window behind her.
+21 Give her candy
+19 Leave the room
+
+21
+You give the girl candy. She nods, almost as if saying thank you.
+She disappears again. 
+22 Try to open the window
+23 Leave the room
+
+22
+You try to open the window. It is locked.
+23 Leave the room
+
+23
+You enter a hallway. There are two doors on each
+side of the hallway. 
+24 Enter door 3
+26 Enter door 4
+
+24
+The room is empty. On the walls, there are various scribbles.
+25 Inspect the scribbles
+23 Leave the room
+
+25
+The scribbles on the walls have different sentences.
+"I miss mom."
+"I want to leave."
+"Where are you?"
+23 Leave the room
+
+26
+You enter a bathroom. There is a sink, a toilet, and a tub.
+27 Look inside the tub
+23 Leave the room
+
+27
+There is nothing in the tub.
+28 Leave the room
+
+28
+You enter the hallway. All doors slam closed.
+29 Walk forward
+
+29
+You walk forward, moving further into the hallway.
+The hallway seems to last forever.
+30 Walk further
+
+30
+You walk further.
+31 Walk further
+
+31
+You walk further. This hallway is long.
+32 Walk further
+
+32
+You walk further. You see a shadow pass by.
+33 Walk further
+
+33
+You walk further. You hear quiet sobs.
+34 Walk further
+
+34
+You walk further. The small girl sits in front of a final door.
+35 Ask her to move
+36 Tell her about the tub
+37 Kneel down
+
+35
+You ask her to move. She seems unhappy.
+She screams.
+0 Play again
+
+36
+You tell the girl about the tub you saw.
+Why? There was nothing even there...
+0 Play again
+
+37
+You kneel down. The girl looks up at you expectantly.
+38 Ask to leave
+
+38
+You ask the girl if you can leave. She frowns.
+She vanishes, and the door behind her opens.
+39 Leave through the door
+
+39
+You have successfully left the house.
 0 Play again
